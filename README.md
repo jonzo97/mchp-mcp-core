@@ -27,8 +27,9 @@ Data Layer (storage, retrieval)
 
 ### 🗄️ Vector Storage (`mchp_mcp_core.storage`)
 - **Qdrant**: Production-ready vector store with hybrid search (BM25 + vector)
-- **ChromaDB**: Development-friendly vector database
-- **SQLite**: Caching layer for exact retrieval
+- **ChromaDB**: Development-friendly vector database (NEW in v0.1.1)
+- **SQLite**: Async caching layer for state management (NEW in v0.1.1)
+- **Manifest System**: Document versioning and ingestion tracking (NEW in v0.1.1)
 - **Hybrid Storage**: Automatic fallback between vector and cache
 - **Deduplication**: SHA-256 content hashing
 
@@ -79,9 +80,9 @@ chunks = extractor.extract_document("datasheet.pdf", "doc_id_123")
 print(f"Extracted {len(chunks)} chunks")
 ```
 
-### Example: Vector Storage
+### Example: Vector Storage (Qdrant)
 ```python
-from mchp_mcp_core.storage import QdrantVectorStore
+from mchp_mcp_core.storage import QdrantVectorStore, SearchQuery
 from mchp_mcp_core.embeddings import EmbeddingModel
 
 embedder = EmbeddingModel()
@@ -91,7 +92,59 @@ store = QdrantVectorStore(embedding_model=embedder)
 store.add_documents(chunks)
 
 # Hybrid search (BM25 + vector)
-results = store.search("FPGA clock frequency", top_k=5, hybrid=True)
+query = SearchQuery(query="FPGA clock frequency", top_k=5, hybrid=True)
+results = store.search(query)
+```
+
+### Example: ChromaDB (Development)
+```python
+from mchp_mcp_core.storage import ChromaDBVectorStore, SearchQuery
+
+# No server required - perfect for dev/prototyping
+store = ChromaDBVectorStore(db_path="./chroma_data")
+
+if store.is_available():
+    store.add_documents(chunks)
+    query = SearchQuery(query="memory specifications", top_k=5)
+    results = store.search(query)
+```
+
+### Example: SQLite Caching
+```python
+from mchp_mcp_core.storage import SQLiteCache
+
+async with SQLiteCache("./cache.db") as cache:
+    # Cache chunks for fast exact retrieval
+    await cache.insert_chunks(chunks)
+
+    # Retrieve by document ID
+    stored_chunks = await cache.get_chunks(doc_id="datasheet_001")
+
+    # Store embeddings as fallback
+    await cache.insert_embeddings([(chunk_id, vector)], model_name="bge-small")
+```
+
+### Example: Document Manifest
+```python
+from mchp_mcp_core.storage import ManifestRepository, DocumentManifest, ManifestStatus
+from pathlib import Path
+
+repo = ManifestRepository(Path("./manifest.db"))
+
+# Track document version and processing state
+manifest = DocumentManifest(
+    doc_id="polarfire_datasheet",
+    version="v2.1",
+    checksum="abc123...",
+    size_bytes=2048000,
+    status=ManifestStatus.STAGED
+)
+
+entry = repo.upsert(manifest)
+repo.update_status(entry.checksum, ManifestStatus.READY)
+
+# Query by status
+ready_docs = repo.list_by_status(ManifestStatus.READY)
 ```
 
 ### Example: LLM Client
@@ -168,5 +221,22 @@ Jonathan Orgill - Microchip FAE
 
 ---
 
-**Generated:** 2025-10-07
-**Version:** 0.1.0 (Initial scaffold)
+**Generated:** 2025-10-09
+**Version:** 0.1.1 (Phase 2A: Storage Completeness)
+
+## Release Notes
+
+### v0.1.1 (2025-10-09) - Phase 2A: Storage Completeness
+- ✅ **ChromaDB Support**: Development-friendly vector store with graceful fallback
+- ✅ **SQLite Caching**: Async state management and embedding fallback
+- ✅ **Manifest System**: Document versioning with SQLModel
+- ✅ **Enhanced Dependencies**: Added aiosqlite, sqlmodel
+- ✅ **Documentation**: PROJECTS_MAP.md with tool selection intelligence
+
+### v0.1.0 (2025-10-07) - Initial Release
+- ✅ Core extractors (PDF, PPTX, tables, chunking)
+- ✅ Qdrant vector store with hybrid search
+- ✅ Embedding wrapper (sentence-transformers)
+- ✅ LLM client with retry logic
+- ✅ Security utilities (PII, validation)
+- ✅ Pydantic-based configuration
