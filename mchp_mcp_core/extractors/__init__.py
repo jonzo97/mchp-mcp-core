@@ -6,6 +6,7 @@ Provides extractors for various document formats:
 - Tables (pdfplumber multi-strategy)
 - PPTX (python-pptx slide parsing)
 - Chunking (fixed-size and semantic strategies)
+- Metadata (document type, product family, version, date extraction)
 """
 
 from mchp_mcp_core.extractors.chunking import (
@@ -23,6 +24,7 @@ from mchp_mcp_core.extractors.tables import (
 )
 from mchp_mcp_core.extractors.pdf import PDFExtractor
 from mchp_mcp_core.extractors.pptx import PPTXExtractor
+from mchp_mcp_core.extractors.metadata import MetadataExtractor, extract_metadata
 
 __all__ = [
     # Chunking
@@ -39,4 +41,7 @@ __all__ = [
     # Extractors
     "PDFExtractor",
     "PPTXExtractor",
+    # Metadata
+    "MetadataExtractor",
+    "extract_metadata",
 ]
