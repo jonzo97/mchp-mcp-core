@@ -24,6 +24,7 @@ from mchp_mcp_core.extractors.tables import (
 )
 from mchp_mcp_core.extractors.pdf import PDFExtractor
 from mchp_mcp_core.extractors.pptx import PPTXExtractor
+from mchp_mcp_core.extractors.docx import DOCXExtractor
 from mchp_mcp_core.extractors.metadata import MetadataExtractor, extract_metadata
 
 __all__ = [
@@ -41,6 +42,7 @@ __all__ = [
     # Extractors
     "PDFExtractor",
     "PPTXExtractor",
+    "DOCXExtractor",
     # Metadata
     "MetadataExtractor",
     "extract_metadata",

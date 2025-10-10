@@ -12,9 +12,17 @@ from mchp_mcp_core.analysis.terminology import (
     TermVariation,
     TerminologyAnalyzer
 )
+from mchp_mcp_core.analysis.abbreviations import (
+    AbbreviationExpander,
+    expand_abbreviations,
+    DEFAULT_ABBREVIATIONS
+)
 
 __all__ = [
     "Term",
     "TermVariation",
     "TerminologyAnalyzer",
+    "AbbreviationExpander",
+    "expand_abbreviations",
+    "DEFAULT_ABBREVIATIONS",
 ]

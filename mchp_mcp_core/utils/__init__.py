@@ -24,6 +24,11 @@ from mchp_mcp_core.utils.hashing import (
     compute_checksums,
     find_duplicates
 )
+from mchp_mcp_core.utils.async_batch import (
+    process_batch_concurrent,
+    process_batch_chunked,
+    rate_limited_batch
+)
 
 __all__ = [
     # Config
@@ -41,4 +46,8 @@ __all__ = [
     "compute_checksum",
     "compute_checksums",
     "find_duplicates",
+    # Async batch processing
+    "process_batch_concurrent",
+    "process_batch_chunked",
+    "rate_limited_batch",
 ]
