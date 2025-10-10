@@ -52,6 +52,18 @@ Data Layer (storage, retrieval)
 - **File Type Restrictions**: Whitelist-based file validation
 - **Sandboxing**: Restrict operations to workspace directories
 
+### 📊 Analysis (`mchp_mcp_core.analysis`) (NEW in v0.1.3)
+- **Terminology Consistency**: Detect variations and inconsistencies in technical terms
+- **Configurable Patterns**: Extensible regex patterns for domain-specific terminology
+- **Severity Scoring**: Critical, high, medium, low issue classification
+- **Brand Compliance**: Flag branded vs unbranded term mixing
+
+### ✅ Validation (`mchp_mcp_core.validation`) (NEW in v0.1.3)
+- **Semantic Completeness**: LLM-based claim extraction and evidence validation
+- **Missing Evidence Detection**: Identify unsupported claims in documentation
+- **Knowledge Base Integration**: Optional RAG enhancement with approved examples
+- **Actionable Suggestions**: Generate specific recommendations for improvement
+
 ### 🛠️ Utilities (`mchp_mcp_core.utils`)
 - **Configuration**: Pydantic Settings-based config management
 - **Logging**: Structured logging with secret masking
@@ -126,6 +138,63 @@ for checksum, file_list in duplicates.items():
     print(f"Duplicate set ({len(file_list)} files):")
     for path in file_list:
         print(f"  - {path}")
+```
+
+### Example: Terminology Consistency Analysis
+```python
+from mchp_mcp_core.analysis import TerminologyAnalyzer
+
+# Use default patterns (connectivity, peripherals, features, memory)
+analyzer = TerminologyAnalyzer()
+report = await analyzer.analyze_terminology(chunks)
+
+print(f"Consistency rate: {report['consistency_rate']}%")
+print(f"Issues found: {report['inconsistent_terms']}")
+
+# Critical issues (e.g., brand compliance)
+for issue in report['critical_issues']:
+    print(f"❗ {issue['term']}: {issue['variations']}")
+    print(f"   Recommend: {issue['recommended']}")
+
+# Custom patterns for your domain
+custom_patterns = {
+    'protocols': [
+        (r'TCP/IP', 'TCP/IP'),
+        (r'tcpip', 'TCP/IP'),
+        (r'Modbus', 'Modbus'),
+    ]
+}
+analyzer = TerminologyAnalyzer(term_patterns=custom_patterns)
+```
+
+### Example: Semantic Completeness Validation
+```python
+from mchp_mcp_core.validation import CompletenessValidator
+from mchp_mcp_core.llm import LLMClient
+
+# Initialize with LLM client
+llm = LLMClient(config)
+validator = CompletenessValidator(llm_client=llm)
+
+# Validate documentation completeness
+report = await validator.validate_completeness(chunks)
+
+print(f"Support rate: {report['support_rate']}%")
+print(f"Claims: {report['total_claims']}")
+print(f"Unsupported: {report['claims_unsupported']}")
+
+# Critical issues (claims without evidence)
+for issue in report['critical_issues']:
+    print(f"❗ Claim: {issue['claim']}")
+    print(f"   Section: {issue['section']} (p.{issue['page']})")
+    print(f"   Missing: {', '.join(issue['missing_evidence'])}")
+    print(f"   Suggestion: {issue['suggestion']}")
+
+# With knowledge base (RAG enhancement)
+validator = CompletenessValidator(
+    llm_client=llm,
+    knowledge_base=kb_manager  # Provides approved examples
+)
 ```
 
 ### Example: Vector Storage (Qdrant)
@@ -270,9 +339,17 @@ Jonathan Orgill - Microchip FAE
 ---
 
 **Generated:** 2025-10-09
-**Version:** 0.1.2 (Phase 2B: Metadata & Hashing)
+**Version:** 0.1.3 (Phase 2C: Analysis & Validation)
 
 ## Release Notes
+
+### v0.1.3 (2025-10-09) - Phase 2C: Analysis & Validation
+- ✅ **Terminology Consistency Analysis**: Detect term variations and inconsistencies
+- ✅ **Configurable Term Patterns**: Extensible for domain-specific terminology
+- ✅ **Semantic Completeness Validation**: LLM-based claim extraction and evidence checking
+- ✅ **Knowledge Base Integration**: Optional RAG enhancement for suggestions
+- ✅ **Severity Classification**: Critical, high, medium, low issue levels
+- ✅ **Actionable Reporting**: Specific recommendations for documentation improvement
 
 ### v0.1.2 (2025-10-09) - Phase 2B: Metadata & Hashing
 - ✅ **Metadata Extraction**: Document type, product family, version, and date detection
