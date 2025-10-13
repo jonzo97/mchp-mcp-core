@@ -22,8 +22,9 @@ Data Layer (storage, retrieval)
 - **PDF Extraction**: PyMuPDF-based extraction with structure preservation
 - **Table Extraction**: Multi-strategy table extraction using pdfplumber
 - **PPTX Extraction**: PowerPoint slide parsing
+- **DOCX Extraction**: Microsoft Word document processing (NEW in v0.1.4)
 - **Intelligent Chunking**: Fixed-size and semantic chunking strategies
-- **Metadata Extraction**: Document type, product family, version, and date detection (NEW in v0.1.2)
+- **Metadata Extraction**: Document type, product family, version, and date detection
 - **Confidence Scoring**: Quality assessment for extracted content
 
 ### 🗄️ Vector Storage (`mchp_mcp_core.storage`)
@@ -52,8 +53,9 @@ Data Layer (storage, retrieval)
 - **File Type Restrictions**: Whitelist-based file validation
 - **Sandboxing**: Restrict operations to workspace directories
 
-### 📊 Analysis (`mchp_mcp_core.analysis`) (NEW in v0.1.3)
+### 📊 Analysis (`mchp_mcp_core.analysis`)
 - **Terminology Consistency**: Detect variations and inconsistencies in technical terms
+- **Abbreviation Expansion**: 70+ default technical abbreviations for improved search recall (NEW in v0.1.4)
 - **Configurable Patterns**: Extensible regex patterns for domain-specific terminology
 - **Severity Scoring**: Critical, high, medium, low issue classification
 - **Brand Compliance**: Flag branded vs unbranded term mixing
@@ -67,8 +69,32 @@ Data Layer (storage, retrieval)
 ### 🛠️ Utilities (`mchp_mcp_core.utils`)
 - **Configuration**: Pydantic Settings-based config management
 - **Logging**: Structured logging with secret masking
-- **Hashing**: File checksums and deduplication detection (NEW in v0.1.2)
+- **Hashing**: File checksums and deduplication detection
+- **Async Batch Processing**: Concurrent processing with semaphore control (NEW in v0.1.4)
 - **Common Models**: Shared Pydantic schemas
+
+### 🔄 Ingestion (`mchp_mcp_core.ingestion`) (NEW in v0.1.5)
+- **Orchestration**: Multi-format batch ingestion with parallel processing
+- **Manifest Tracking**: Checksum-based deduplication and status tracking
+- **Progress Display**: Rich progress bars with ETA
+- **Error Handling**: Graceful failure with detailed reporting
+- **JSONL Export**: Standard corpus format for downstream processing
+- **HTML Reports**: Visual summaries with metrics
+
+### 📝 Output (`mchp_mcp_core.output`) (NEW in v0.1.6)
+- **Markdown Generation**: Document reassembly with TOC and citations
+- **Result Filtering**: Severity-based prioritization (CRITICAL → LOW)
+- **Deduplication**: Similarity-based result filtering
+- **Citation Formatting**: Standardized reference strings
+- **JSON Export**: Programmatic result access
+
+### 📈 Evaluation (`mchp_mcp_core.evaluation`) (NEW in v0.1.6)
+- **Precision@K**: Standard IR metric (P@1, P@3, P@5)
+- **Mean Reciprocal Rank**: MRR calculation
+- **Recall@K**: Coverage metrics
+- **Batch Evaluation**: Test query processing with progress tracking
+- **HTML Reports**: Dark-themed metric dashboards
+- **Latency Tracking**: Query performance monitoring
 
 ## Installation
 
@@ -276,6 +302,106 @@ async with LLMClient(config) as client:
     print(f"Confidence: {response.confidence:.2%}")
 ```
 
+### Example: Abbreviation Expansion
+```python
+from mchp_mcp_core.analysis import AbbreviationExpander, DEFAULT_ABBREVIATIONS
+
+expander = AbbreviationExpander(DEFAULT_ABBREVIATIONS)
+
+# Expand for better search recall
+query = "Configure SPI bus and I2C interface"
+expanded = expander.expand_query(query)
+# → "Configure SPI Serial Peripheral Interface bus and I2C Inter-Integrated Circuit interface"
+
+# 70+ defaults: SPI, I2C, UART, USB, WiFi, SRAM, ADC, PWM, GPIO, etc.
+```
+
+### Example: Ingestion Orchestrator
+```python
+from mchp_mcp_core.ingestion import IngestionOrchestrator
+from mchp_mcp_core.storage import QdrantVectorStore, ManifestRepository
+from mchp_mcp_core.embeddings import EmbeddingModel
+from pathlib import Path
+
+# Setup components
+orchestrator = IngestionOrchestrator(
+    vector_store=QdrantVectorStore(),
+    embedding_model=EmbeddingModel(),
+    manifest_repo=ManifestRepository(Path("./data/manifest.db")),
+    max_concurrent=10
+)
+
+# Run complete pipeline
+report = await orchestrator.run(
+    directory="./docs",
+    output_jsonl="./data/corpus.jsonl",
+    report_html="./data/report.html",
+    recursive=True
+)
+
+print(f"✅ Processed {report.total_files} files")
+print(f"📊 Created {report.total_chunks} chunks")
+print(f"⏱️  Duration: {report.duration_seconds:.1f}s")
+print(f"✨ Success rate: {report.success_rate:.1f}%")
+```
+
+### Example: Markdown Generation
+```python
+from mchp_mcp_core.output import MarkdownGenerator
+
+generator = MarkdownGenerator(include_toc=True, include_page_refs=True)
+
+# Generate from search results
+markdown = generator.generate_from_results(
+    results=search_results,
+    title="PolarFire FPGA Documentation",
+    metadata={"product": "PolarFire", "version": "v2.0"}
+)
+
+with open("output.md", "w") as f:
+    f.write(markdown)
+```
+
+### Example: Result Filtering
+```python
+from mchp_mcp_core.output import OutputFilter, filter_results_by_score
+
+# Filter by severity
+filter_obj = OutputFilter(verbosity='normal')
+changes = [
+    {'type': 'crossref', 'reason': 'broken reference', 'valid': False},
+    {'type': 'style', 'reason': 'terminology inconsistency'}
+]
+filtered = filter_obj.filter_changes(changes)
+print(filter_obj.format_summary(filtered))
+
+# Filter search results by score
+high_quality = filter_results_by_score(results, min_score=0.75, max_results=5)
+```
+
+### Example: Evaluation Metrics
+```python
+from mchp_mcp_core.evaluation import EvaluationMetrics
+
+# Batch evaluation
+evaluator = EvaluationMetrics(search_fn=vector_store.search)
+
+test_queries = [
+    {"query": "SPI configuration", "expected_doc": "Datasheet.pdf", "category": "peripherals"},
+    {"query": "power modes", "expected_doc": "UserGuide.pdf", "category": "power"}
+]
+
+report = evaluator.evaluate_queries(test_queries)
+
+print(f"P@1: {report.p_at_1:.1%}")
+print(f"P@3: {report.p_at_3:.1%}")  # Target: 70%+
+print(f"MRR: {report.mrr:.3f}")
+
+# Generate HTML report
+html = evaluator.generate_html_report(report, title="Quality Assessment")
+Path("eval_report.html").write_text(html)
+```
+
 ## Projects Using This Library
 
 - **mchp-fpga-rag**: FPGA documentation search and RAG system
@@ -338,10 +464,36 @@ Jonathan Orgill - Microchip FAE
 
 ---
 
-**Generated:** 2025-10-09
-**Version:** 0.1.3 (Phase 2C: Analysis & Validation)
+**Generated:** 2025-10-10
+**Version:** 0.1.6 (Phase 2E Complete: C→B→A→D)
 
 ## Release Notes
+
+### v0.1.6 (2025-10-10) - Phases A+D: Output & Evaluation
+- ✅ **Markdown Generation**: Document reassembly with TOC and citations
+- ✅ **Output Filtering**: Severity-based prioritization (CRITICAL/HIGH/MEDIUM/LOW)
+- ✅ **Result Deduplication**: Similarity-based filtering
+- ✅ **Precision@K Metrics**: P@1, P@3, P@5 evaluation
+- ✅ **Mean Reciprocal Rank**: MRR calculation
+- ✅ **Batch Evaluation**: Test query processing with progress tracking
+- ✅ **HTML Reports**: Dark-themed evaluation dashboards
+- ✅ **Latency Tracking**: Query performance monitoring
+
+### v0.1.5 (2025-10-10) - Phase B: Ingestion Orchestration
+- ✅ **Multi-Format Orchestrator**: Unified ingestion for PDF/PPTX/DOCX
+- ✅ **Parallel Processing**: Configurable concurrency with semaphore control
+- ✅ **Manifest Integration**: Checksum-based deduplication and status tracking
+- ✅ **Rich Progress Bars**: Visual feedback with ETA
+- ✅ **Error Handling**: Graceful failure with detailed reporting
+- ✅ **JSONL Export**: Standard corpus format
+- ✅ **HTML Reports**: Visual ingestion summaries
+
+### v0.1.4 (2025-10-10) - Phase C: Quick Wins
+- ✅ **DOCX Extraction**: Microsoft Word document support
+- ✅ **Abbreviation Expansion**: 70+ technical abbreviations (SPI, I2C, UART, etc.)
+- ✅ **Async Batch Processing**: Concurrent processing with semaphore control
+- ✅ **Rate Limiting**: Token bucket pattern for API calls
+- ✅ **Enhanced Dependencies**: Added python-docx, rich
 
 ### v0.1.3 (2025-10-09) - Phase 2C: Analysis & Validation
 - ✅ **Terminology Consistency Analysis**: Detect term variations and inconsistencies
