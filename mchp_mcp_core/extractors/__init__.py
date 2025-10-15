@@ -36,8 +36,14 @@ from mchp_mcp_core.extractors.table_extractors import (
 )
 from mchp_mcp_core.extractors.table_consensus import (
     TableConsensusEngine,
+    HybridConsensusEngine,
     TableMatch,
     ConsensusResult,
+)
+from mchp_mcp_core.extractors.table_llm import (
+    VisionLLMTableExtractor,
+    VisionLLMConfig,
+    VisionLLMProvider,
 )
 from mchp_mcp_core.extractors.table_validation import (
     TableValidator,
@@ -73,8 +79,13 @@ __all__ = [
     "ExtractionStrategy",
     "TableComplexity",
     "TableConsensusEngine",
+    "HybridConsensusEngine",
     "TableMatch",
     "ConsensusResult",
+    # Vision LLM extraction (NEW)
+    "VisionLLMTableExtractor",
+    "VisionLLMConfig",
+    "VisionLLMProvider",
     # Table validation (NEW)
     "TableValidator",
     "ValidationIssue",

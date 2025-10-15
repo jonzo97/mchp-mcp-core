@@ -399,8 +399,226 @@ class TableConsensusEngine:
         return best
 
 
+class HybridConsensusEngine(TableConsensusEngine):
+    """
+    Consensus engine with optional LLM fallback for low-confidence extractions.
+
+    Extends TableConsensusEngine to use vision LLMs as an additional extractor
+    or tiebreaker when traditional methods produce low-confidence results.
+
+    Workflow:
+    1. Run traditional consensus (pdfplumber, camelot, pymupdf)
+    2. Compute confidence scores
+    3. If confidence < threshold AND LLM enabled:
+       → Use LLM as additional extractor
+       → Recompute consensus with LLM result
+    4. Return best version with improved confidence
+
+    Privacy Features:
+    - LLM is opt-in (disabled by default)
+    - Respects local-only and allow_cloud flags
+    - PII redaction before LLM calls
+    - Audit logging when LLM is used
+
+    Example:
+        >>> from mchp_mcp_core.extractors import HybridConsensusEngine
+        >>> from mchp_mcp_core.extractors.table_llm import VisionLLMConfig, VisionLLMProvider
+        >>>
+        >>> llm_config = VisionLLMConfig(
+        ...     enabled=True,
+        ...     provider=VisionLLMProvider.OPENAI,
+        ...     model="gpt-4o",
+        ...     api_key="sk-...",
+        ...     allow_cloud=True
+        ... )
+        >>> engine = HybridConsensusEngine(
+        ...     llm_config=llm_config,
+        ...     llm_fallback_threshold=0.70
+        ... )
+        >>> result = engine.extract_with_consensus("doc.pdf", page_num=5)
+        >>> # LLM used automatically if confidence < 0.70
+    """
+
+    def __init__(
+        self,
+        extractors: Optional[List[str]] = None,
+        llm_config: Optional[Any] = None,  # VisionLLMConfig
+        llm_fallback_threshold: float = 0.70,
+        llm_use_for_no_results: bool = True,
+        min_confidence: float = 0.0,
+        prefer_extractor: Optional[str] = None
+    ):
+        """
+        Initialize hybrid consensus engine.
+
+        Args:
+            extractors: List of traditional extractor names
+            llm_config: VisionLLMConfig for LLM fallback (None = disabled)
+            llm_fallback_threshold: Use LLM if consensus confidence < this value
+            llm_use_for_no_results: Use LLM if no traditional extractors find tables
+            min_confidence: Minimum confidence threshold for results
+            prefer_extractor: Preferred extractor name if tie
+        """
+        super().__init__(extractors, min_confidence, prefer_extractor)
+
+        # LLM configuration
+        self.llm_config = llm_config
+        self.llm_fallback_threshold = llm_fallback_threshold
+        self.llm_use_for_no_results = llm_use_for_no_results
+
+        # Initialize LLM extractor if configured
+        self.llm_extractor = None
+        if llm_config and llm_config.enabled:
+            try:
+                from mchp_mcp_core.extractors.table_llm import VisionLLMTableExtractor
+                self.llm_extractor = VisionLLMTableExtractor(llm_config)
+
+                if self.llm_extractor.is_available():
+                    logger.info(f"LLM fallback enabled: provider={llm_config.provider.value}, threshold={llm_fallback_threshold:.2f}")
+                else:
+                    logger.warning("LLM fallback configured but not available")
+                    self.llm_extractor = None
+            except Exception as e:
+                logger.error(f"Failed to initialize LLM extractor: {e}")
+                self.llm_extractor = None
+
+    def extract_with_consensus(
+        self,
+        pdf_path: str,
+        page_num: int,
+        **extractor_kwargs
+    ) -> ConsensusResult:
+        """
+        Extract tables with consensus and optional LLM fallback.
+
+        Args:
+            pdf_path: Path to PDF file
+            page_num: Page number (0-indexed)
+            **extractor_kwargs: Additional options for extractors
+
+        Returns:
+            ConsensusResult with improved confidence from LLM if used
+        """
+        # Run traditional consensus first
+        result = super().extract_with_consensus(pdf_path, page_num, **extractor_kwargs)
+
+        # Check if LLM fallback should be used
+        if not self.llm_extractor:
+            return result  # LLM not available
+
+        # Case 1: No tables found by any extractor
+        if not result.matches and self.llm_use_for_no_results:
+            logger.info("No tables found by traditional extractors, trying LLM fallback")
+            return self._extract_with_llm_only(pdf_path, page_num, result)
+
+        # Case 2: Low confidence tables
+        llm_used = False
+        for match in result.matches:
+            if match.confidence < self.llm_fallback_threshold:
+                logger.info(f"Table {match.table_index}: Low confidence ({match.confidence:.2f}), using LLM fallback")
+                self._add_llm_to_match(match, pdf_path, page_num)
+                llm_used = True
+
+        if llm_used:
+            logger.info("LLM fallback applied to low-confidence tables")
+
+        return result
+
+    def _extract_with_llm_only(
+        self,
+        pdf_path: str,
+        page_num: int,
+        original_result: ConsensusResult
+    ) -> ConsensusResult:
+        """
+        Extract using LLM when traditional extractors found nothing.
+
+        Args:
+            pdf_path: Path to PDF
+            page_num: Page number
+            original_result: Original consensus result (no matches)
+
+        Returns:
+            Updated ConsensusResult with LLM results
+        """
+        try:
+            llm_result = self.llm_extractor.extract_tables(pdf_path, page_num)
+
+            if llm_result.success and llm_result.tables:
+                logger.info(f"LLM found {len(llm_result.tables)} tables")
+
+                # Create matches from LLM results
+                for table in llm_result.tables:
+                    match = TableMatch(
+                        table_index=table.table_index,
+                        page_num=page_num
+                    )
+                    match.versions["vision_llm"] = table
+                    match.extractor_count = 1
+                    match.best_version = table
+
+                    # Set confidence based on LLM's own confidence
+                    match.confidence = table.confidence
+                    match.agreement_score = 0.5  # Only 1 extractor
+                    match.structure_score = 0.8   # Assume LLM got structure right
+                    match.cell_similarity = 0.8   # Not applicable for single extractor
+
+                    original_result.matches.append(match)
+
+                original_result.success = True
+
+        except Exception as e:
+            logger.error(f"LLM extraction failed: {e}")
+
+        return original_result
+
+    def _add_llm_to_match(
+        self,
+        match: TableMatch,
+        pdf_path: str,
+        page_num: int
+    ):
+        """
+        Add LLM result to an existing match and recompute confidence.
+
+        Args:
+            match: TableMatch to enhance with LLM
+            pdf_path: Path to PDF
+            page_num: Page number
+        """
+        try:
+            # Extract with LLM
+            llm_result = self.llm_extractor.extract_tables(pdf_path, page_num)
+
+            if llm_result.success and llm_result.tables:
+                # Find table matching the index
+                llm_table = None
+                for table in llm_result.tables:
+                    if table.table_index == match.table_index:
+                        llm_table = table
+                        break
+
+                if not llm_table and len(llm_result.tables) > 0:
+                    # If index doesn't match, use first table
+                    llm_table = llm_result.tables[0]
+
+                if llm_table:
+                    # Add LLM result to versions
+                    match.versions["vision_llm"] = llm_table
+                    match.extractor_count = len(match.versions)
+
+                    # Recompute confidence with LLM included
+                    self._compute_confidence(match)
+
+                    logger.debug(f"Added LLM result to table {match.table_index}, new confidence: {match.confidence:.2f}")
+
+        except Exception as e:
+            logger.error(f"Failed to add LLM result to match: {e}")
+
+
 __all__ = [
     "TableMatch",
     "ConsensusResult",
     "TableConsensusEngine",
+    "HybridConsensusEngine",
 ]

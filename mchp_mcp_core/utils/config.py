@@ -12,6 +12,44 @@ from pydantic import Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
+class LLMTableConfig(BaseSettings):
+    """Configuration for LLM-based table extraction (vision models)."""
+
+    # Enable/disable
+    enabled: bool = Field(default=False, description="Enable LLM table extraction")
+
+    # Privacy controls
+    local_only: bool = Field(default=False, description="Use only local models (no cloud)")
+    allow_cloud: bool = Field(default=False, description="Allow cloud API calls")
+    redact_pii_before_llm: bool = Field(default=True, description="Redact PII before LLM")
+
+    # Provider selection
+    provider: str = Field(default="openai", description="LLM provider: openai, anthropic, ollama")
+    model: str = Field(default="gpt-4o", description="Vision model name")
+    api_key_env: str = Field(default="OPENAI_API_KEY", description="Environment variable for API key")
+    api_url: Optional[str] = Field(None, description="Custom API URL (for Ollama or self-hosted)")
+
+    # Model parameters
+    temperature: float = Field(default=0.0, ge=0.0, le=2.0, description="Temperature")
+    max_tokens: int = Field(default=4000, ge=1, description="Max tokens in response")
+    timeout: int = Field(default=60, ge=1, description="Request timeout (seconds)")
+
+    # Fallback strategy
+    use_as_fallback: bool = Field(default=True, description="Use LLM only when confidence < threshold")
+    fallback_threshold: float = Field(default=0.70, ge=0.0, le=1.0, description="Confidence threshold")
+    use_for_no_results: bool = Field(default=True, description="Use LLM if no tables found")
+
+    # Limits
+    max_image_size_mb: float = Field(default=5.0, ge=0.1, description="Max image size for LLM")
+
+    model_config = SettingsConfigDict(
+        env_prefix="LLM_TABLE_",
+        env_file=".env",
+        env_file_encoding="utf-8",
+        extra="allow"
+    )
+
+
 class ExtractionConfig(BaseSettings):
     """Configuration for document extraction."""
 
@@ -31,6 +69,9 @@ class ExtractionConfig(BaseSettings):
     preserve_sections: bool = Field(default=True, description="Preserve section hierarchy")
     extract_images: bool = Field(default=True, description="Extract images/figures")
     extract_tables: bool = Field(default=True, description="Extract tables")
+
+    # LLM table extraction
+    llm_tables: LLMTableConfig = Field(default_factory=LLMTableConfig, description="LLM table extraction settings")
 
     model_config = SettingsConfigDict(
         env_prefix="EXTRACTION_",
