@@ -43,8 +43,8 @@ dev = [
 ]
 tables = [
     # Advanced table extraction with camelot
-    "camelot-py[cv]>=0.11.0",
-    "opencv-python>=4.8.0",
+    "camelot-py>=0.11.0",
+    "opencv-python-headless>=4.8.0",
 ]
 
 [tool.setuptools.packages.find]
