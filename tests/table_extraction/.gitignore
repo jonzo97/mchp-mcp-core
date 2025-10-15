@@ -1,0 +1,11 @@
+# Exclude sample PDF files (may contain proprietary content)
+sample_pdfs/*.pdf
+
+# Exclude generated reports
+accuracy_report.html
+*.html
+
+# Python cache
+__pycache__/
+*.pyc
+.pytest_cache/

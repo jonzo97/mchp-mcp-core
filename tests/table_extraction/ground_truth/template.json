@@ -1,0 +1,27 @@
+{
+  "pdf_filename": "example.pdf",
+  "page_num": 0,
+  "description": "Brief description of what this test validates",
+  "table_index": 0,
+  "metadata": {
+    "complexity": "simple",
+    "has_merged_cells": false,
+    "has_multi_level_headers": false,
+    "table_type": "data"
+  },
+  "expected_table": {
+    "rows": 3,
+    "columns": 3,
+    "data": [
+      ["Header 1", "Header 2", "Header 3"],
+      ["Row 1, Col 1", "Row 1, Col 2", "Row 1, Col 3"],
+      ["Row 2, Col 1", "Row 2, Col 2", "Row 2, Col 3"]
+    ]
+  },
+  "validation_rules": {
+    "exact_match_required": false,
+    "allow_whitespace_differences": true,
+    "critical_cells": [],
+    "min_cell_accuracy": 0.90
+  }
+}

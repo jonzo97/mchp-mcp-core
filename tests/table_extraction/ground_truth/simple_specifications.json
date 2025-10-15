@@ -1,0 +1,30 @@
+{
+  "pdf_filename": "simple_specifications.pdf",
+  "page_num": 0,
+  "description": "Simple 2-column specification table with parameter names and values - common in datasheets",
+  "table_index": 0,
+  "metadata": {
+    "complexity": "simple",
+    "has_merged_cells": false,
+    "has_multi_level_headers": false,
+    "table_type": "specifications"
+  },
+  "expected_table": {
+    "rows": 6,
+    "columns": 2,
+    "data": [
+      ["Parameter", "Value"],
+      ["Operating Voltage", "3.3V"],
+      ["Operating Temperature", "-40°C to +85°C"],
+      ["Clock Frequency", "100 MHz"],
+      ["Power Consumption", "250 mW"],
+      ["Package Type", "TQFP-144"]
+    ]
+  },
+  "validation_rules": {
+    "exact_match_required": false,
+    "allow_whitespace_differences": true,
+    "critical_cells": [[0, 0], [0, 1], [1, 0], [1, 1]],
+    "min_cell_accuracy": 0.95
+  }
+}

@@ -1,0 +1,31 @@
+{
+  "pdf_filename": "timing_requirements.pdf",
+  "page_num": 0,
+  "description": "Timing requirements table with some empty cells (sparse table) - tests handling of optional parameters",
+  "table_index": 0,
+  "metadata": {
+    "complexity": "medium",
+    "has_merged_cells": false,
+    "has_multi_level_headers": false,
+    "table_type": "specifications"
+  },
+  "expected_table": {
+    "rows": 7,
+    "columns": 5,
+    "data": [
+      ["Symbol", "Parameter", "Min", "Typ", "Max"],
+      ["tCLK", "Clock period", "10", "12.5", "100"],
+      ["tSU", "Setup time", "2", "", ""],
+      ["tH", "Hold time", "3", "", ""],
+      ["tCO", "Clock to output", "", "5", "8"],
+      ["tPD", "Propagation delay", "", "", "15"],
+      ["fMAX", "Maximum frequency", "", "80", "100"]
+    ]
+  },
+  "validation_rules": {
+    "exact_match_required": false,
+    "allow_whitespace_differences": true,
+    "critical_cells": [[0, 0], [0, 1], [1, 0], [1, 1]],
+    "min_cell_accuracy": 0.90
+  }
+}

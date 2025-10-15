@@ -1,0 +1,32 @@
+{
+  "pdf_filename": "pin_configuration.pdf",
+  "page_num": 0,
+  "description": "Pin configuration table with 4 columns - Pin Number, Pin Name, Type, Description",
+  "table_index": 0,
+  "metadata": {
+    "complexity": "medium",
+    "has_merged_cells": false,
+    "has_multi_level_headers": false,
+    "table_type": "specifications"
+  },
+  "expected_table": {
+    "rows": 8,
+    "columns": 4,
+    "data": [
+      ["Pin", "Name", "Type", "Description"],
+      ["1", "VDD", "Power", "Power supply voltage"],
+      ["2", "GND", "Ground", "Ground reference"],
+      ["3", "SCK", "I/O", "SPI clock"],
+      ["4", "MOSI", "Input", "SPI master out slave in"],
+      ["5", "MISO", "Output", "SPI master in slave out"],
+      ["6", "CS", "Input", "Chip select (active low)"],
+      ["7", "RST", "Input", "Reset (active low)"]
+    ]
+  },
+  "validation_rules": {
+    "exact_match_required": false,
+    "allow_whitespace_differences": true,
+    "critical_cells": [[0, 0], [0, 1], [0, 2], [0, 3], [1, 0], [1, 1]],
+    "min_cell_accuracy": 0.92
+  }
+}
