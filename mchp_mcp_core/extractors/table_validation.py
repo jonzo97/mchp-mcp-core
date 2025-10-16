@@ -152,7 +152,7 @@ class TableValidator:
             return
 
         first_row = table.data[0]
-        if all(not cell or cell.strip() == "" for cell in first_row):
+        if all(not cell or str(cell).strip() == "" for cell in first_row):
             result.issues.append((
                 ValidationIssue.EMPTY_HEADER,
                 "First row (header) is completely empty"
@@ -165,7 +165,7 @@ class TableValidator:
 
         empty_rows = sum(
             1 for row in table.data
-            if all(not cell or cell.strip() == "" for cell in row)
+            if all(not cell or str(cell).strip() == "" for cell in row)
         )
 
         ratio = empty_rows / len(table.data)
@@ -205,9 +205,10 @@ class TableValidator:
                 if not cell:
                     continue
 
+                cell_str = str(cell)
                 for pattern, description in suspicious_patterns:
-                    if re.search(pattern, cell):
-                        issues_found.append(f"({row_idx},{col_idx}): {cell}")
+                    if re.search(pattern, cell_str):
+                        issues_found.append(f"({row_idx},{col_idx}): {cell_str}")
 
         if issues_found:
             result.issues.append((
@@ -230,7 +231,7 @@ class TableValidator:
         # Look for cells with unusual spanning indicators
         for row in table.data:
             for cell in row:
-                if cell and any(marker in cell.lower() for marker in ["colspan", "rowspan", "merged"]):
+                if cell and any(marker in str(cell).lower() for marker in ["colspan", "rowspan", "merged"]):
                     merged_count += 1
 
         if merged_count > 0:
@@ -285,7 +286,7 @@ class TableValidator:
                     continue
 
                 for char in suspicious_chars:
-                    if char in cell:
+                    if char in str(cell):
                         issues_found.append(f"({row_idx},{col_idx})")
 
         if issues_found:
@@ -314,7 +315,7 @@ class TableValidator:
 
         table.data = [
             row for row in table.data
-            if not all(not cell or cell.strip() == "" for cell in row)
+            if not all(not cell or str(cell).strip() == "" for cell in row)
         ]
 
         removed = original_count - len(table.data)
@@ -331,11 +332,11 @@ class TableValidator:
                 if not cell:
                     continue
 
-                original = cell
-                fixed = cell
+                original = str(cell)
+                fixed = str(cell)
 
                 # Only apply to cells that look numeric
-                if re.search(r'\d', cell):
+                if re.search(r'\d', fixed):
                     # O → 0
                     fixed = re.sub(r'(?<=\d)[OoDd](?=\d|$)', '0', fixed)
                     # I, l → 1 (only in numeric context)
@@ -362,7 +363,7 @@ class TableValidator:
                     continue
 
                 # Strip leading/trailing whitespace
-                normalized = cell.strip()
+                normalized = str(cell).strip()
 
                 # Replace multiple spaces with single space
                 normalized = re.sub(r'\s+', ' ', normalized)
@@ -420,7 +421,7 @@ def detect_header_row(table: ExtractedTable) -> int:
 
     # Find first non-empty row
     for idx, row in enumerate(table.data):
-        if any(cell and cell.strip() for cell in row):
+        if any(cell and str(cell).strip() for cell in row):
             return idx
 
     return 0
@@ -453,8 +454,8 @@ def split_multi_row_header(table: ExtractedTable, header_rows: int = 2) -> Extra
         for row_idx in range(header_rows):
             if col_idx < len(table.data[row_idx]):
                 cell = table.data[row_idx][col_idx]
-                if cell and cell.strip():
-                    col_values.append(cell.strip())
+                if cell and str(cell).strip():
+                    col_values.append(str(cell).strip())
 
         merged_header.append(" ".join(col_values))
 
