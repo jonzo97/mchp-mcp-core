@@ -21,6 +21,7 @@ from mchp_mcp_core.extractors.table_extractors import (
     CamelotExtractor,
     PyMuPDFExtractor,
 )
+from mchp_mcp_core.extractors.table_detection import TableDetector
 from mchp_mcp_core.utils import get_logger
 
 logger = get_logger(__name__)
@@ -96,7 +97,8 @@ class TableConsensusEngine:
         self,
         extractors: Optional[List[str]] = None,
         min_confidence: float = 0.0,
-        prefer_extractor: Optional[str] = None
+        prefer_extractor: Optional[str] = None,
+        enable_detection_filter: bool = True
     ):
         """
         Initialize consensus engine.
@@ -106,6 +108,7 @@ class TableConsensusEngine:
                        If None, uses all available extractors
             min_confidence: Minimum confidence threshold (0.0-1.0)
             prefer_extractor: If multiple versions have same confidence, prefer this one
+            enable_detection_filter: Enable pre-extraction validation to filter false positives
         """
         self.extractors_map = {
             "pdfplumber": PdfPlumberExtractor(),
@@ -129,7 +132,19 @@ class TableConsensusEngine:
         self.min_confidence = min_confidence
         self.prefer_extractor = prefer_extractor
 
+        # Table detection filter (Phase 1 enhancement)
+        self.enable_detection_filter = enable_detection_filter
+        self.detector = TableDetector(
+            min_rows=2,
+            min_columns=2,
+            max_sparsity=0.70,
+            min_content_ratio=0.15,
+            strict_mode=False
+        ) if enable_detection_filter else None
+
         logger.info(f"Initialized consensus engine with extractors: {list(self.active_extractors.keys())}")
+        if enable_detection_filter:
+            logger.info("Detection filter enabled (filters false positives)")
 
     def extract_with_consensus(
         self,
@@ -170,6 +185,43 @@ class TableConsensusEngine:
 
         # Match tables across extractors
         matches = self._match_tables(extraction_results, page_num)
+
+        # Apply detection filter to remove false positives
+        if self.detector:
+            filtered_matches = []
+            for match in matches:
+                # Validate each version
+                validation_results = {}
+                for extractor_name, table in match.versions.items():
+                    validation_results[extractor_name] = self.detector.validate(table)
+
+                # Keep match if at least one version passes validation
+                valid_versions = {
+                    name: table
+                    for name, table in match.versions.items()
+                    if validation_results[name].is_valid_table
+                }
+
+                if valid_versions:
+                    # Update match with only valid versions
+                    match.versions = valid_versions
+                    match.extractor_count = len(valid_versions)
+                    filtered_matches.append(match)
+
+                    # Log filtered versions
+                    if len(valid_versions) < len(validation_results):
+                        invalid_count = len(validation_results) - len(valid_versions)
+                        logger.debug(
+                            f"Detection filter removed {invalid_count} false positive(s) "
+                            f"for table {match.table_index} on page {page_num}"
+                        )
+                else:
+                    logger.debug(
+                        f"Detection filter rejected table {match.table_index} "
+                        f"on page {page_num}: all versions failed validation"
+                    )
+
+            matches = filtered_matches
 
         # Compute confidence for each match
         for match in matches:

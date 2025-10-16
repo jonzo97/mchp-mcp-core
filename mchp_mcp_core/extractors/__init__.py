@@ -52,6 +52,11 @@ from mchp_mcp_core.extractors.table_validation import (
     detect_header_row,
     split_multi_row_header,
 )
+from mchp_mcp_core.extractors.table_detection import (
+    TableDetector,
+    DetectionIssue,
+    DetectionResult,
+)
 from mchp_mcp_core.extractors.pdf import PDFExtractor
 from mchp_mcp_core.extractors.pptx import PPTXExtractor
 from mchp_mcp_core.extractors.docx import DOCXExtractor
@@ -92,6 +97,10 @@ __all__ = [
     "ValidationResult",
     "detect_header_row",
     "split_multi_row_header",
+    # Table detection (Phase 1)
+    "TableDetector",
+    "DetectionIssue",
+    "DetectionResult",
     # Extractors
     "PDFExtractor",
     "PPTXExtractor",
