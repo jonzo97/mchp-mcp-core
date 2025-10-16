@@ -46,6 +46,12 @@ tables = [
     "camelot-py>=0.11.0",
     "opencv-python-headless>=4.8.0",
 ]
+evaluation = [
+    # Industry-standard table evaluation metrics (Phase 2)
+    "table-recognition-metric>=1.0.0",  # TEDS/S-TEDS implementation
+    "editdistance>=0.6.0",  # Fast edit distance for TEDS
+    "lxml>=4.9.0",  # HTML parsing for table comparison
+]
 
 [tool.setuptools.packages.find]
 where = ["."]

@@ -57,6 +57,12 @@ from mchp_mcp_core.extractors.table_detection import (
     DetectionIssue,
     DetectionResult,
 )
+from mchp_mcp_core.extractors.table_evaluation import (
+    TableEvaluator,
+    EvaluationMetrics,
+    MetricType,
+    compute_straight_through_processing_rate,
+)
 from mchp_mcp_core.extractors.pdf import PDFExtractor
 from mchp_mcp_core.extractors.pptx import PPTXExtractor
 from mchp_mcp_core.extractors.docx import DOCXExtractor
@@ -101,6 +107,11 @@ __all__ = [
     "TableDetector",
     "DetectionIssue",
     "DetectionResult",
+    # Table evaluation (Phase 2)
+    "TableEvaluator",
+    "EvaluationMetrics",
+    "MetricType",
+    "compute_straight_through_processing_rate",
     # Extractors
     "PDFExtractor",
     "PPTXExtractor",
