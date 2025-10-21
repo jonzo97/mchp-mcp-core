@@ -63,6 +63,23 @@ from mchp_mcp_core.extractors.table_evaluation import (
     MetricType,
     compute_straight_through_processing_rate,
 )
+from mchp_mcp_core.extractors.table_multipage import (
+    MultiPageTableDetector,
+    TableSpan,
+    ContinuationType,
+)
+from mchp_mcp_core.extractors.table_merging import (
+    TableMerger,
+    MergeResult,
+)
+from mchp_mcp_core.extractors.table_screenshots import (
+    TableScreenshotGenerator,
+    estimate_table_bbox,
+)
+from mchp_mcp_core.extractors.table_header_detector import (
+    TableHeaderDetector,
+    HeaderDetectionResult,
+)
 from mchp_mcp_core.extractors.pdf import PDFExtractor
 from mchp_mcp_core.extractors.pptx import PPTXExtractor
 from mchp_mcp_core.extractors.docx import DOCXExtractor
@@ -112,6 +129,17 @@ __all__ = [
     "EvaluationMetrics",
     "MetricType",
     "compute_straight_through_processing_rate",
+    # Multi-page tables (Phase 3A)
+    "MultiPageTableDetector",
+    "TableSpan",
+    "ContinuationType",
+    "TableMerger",
+    "MergeResult",
+    "TableScreenshotGenerator",
+    "estimate_table_bbox",
+    # Header detection (Phase 3D)
+    "TableHeaderDetector",
+    "HeaderDetectionResult",
     # Extractors
     "PDFExtractor",
     "PPTXExtractor",

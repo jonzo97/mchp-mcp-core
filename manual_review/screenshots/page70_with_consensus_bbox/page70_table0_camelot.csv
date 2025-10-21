@@ -1,0 +1,14 @@
+0,1,2,3,4,5,6,7,8
+,,,,,,,,Signal Description
+Table 6-19. SDHC0 and SDHC1 Pinout I/O Descriptions (Peripheral Function I) (continued),,,,,,,,
+,,,PIN NUMBER,,,,,
+,,,,,,,FUNCTION,
+PIN NAME,100 pin,144 pin,144 pin,176 pin,208 pin,PIN TYPE,,DESCRIPTION
+,,,,,,,TYPE,
+,TQFP EP,TQFP EP,TFBGA,TFBGA,TFBGA,,,
+,,,,,,,,SD Host Controller 1 DATA3
+SDHC1_SDDAT3,—,—,—,H12,H18,I/O,ST/CMOS,
+,,,,,,,,(10K-100K Pull-up required)
+,,,,,,,,SD Host Controller 1 Write Protect
+SDHC1_SDWP,—,—,—,H15,G15,I,ST,
+,,,,,,,,(10K-100K Pull-up required)

@@ -1,0 +1,77 @@
+0,1,2,3,4,5,6,7,8,9,10,11,12,13,14
+Table 5-1. 100-pin TQFP EP Thin Plastic Quad Flatpack (continued),,,,,,,,,,,,,,
+,,,,,,,,,MUXEN =1,,,,,
+,Priority,,,,,,,,,,,,,
+,,,,,,,,,PMUX Values,,,,,
+,Function,,,,,,,,,,,,,
+,,,00,01,03,05,06,07,08,09,0A,0B,0D,0F
+,,,,,,,,,,SPI_IXS /,,,,
+Pin,RTC,MUXEN=0,,,,,,,,,,Only 2,,
+,,,,,,,,,,"SWCLK,",,,,
+,security,,,,,,,,,,,alternate,,
+,tamper,,EIC /,ADC /,,,,CAN(n) /,,"SWDIO,",,,,
+,,,,,SERCOM(n),TCC WO(n),MLB,,SDMMC,,ETH,,GCLK,PTC
+,,,EIC_EXTINT(n),CMP,,,,SQI(n),,,,ETH,,
+,input,,,,,,,,,"SWO, TRACE_CLK,",,,,
+,loop(s),,,,,,,,,,,signals,,
+,,,,,,,,,,TRACE_DATA[3:0],,,,
+32,-,PB4,EIC_EXTINT4,-,-,-,-,-,-,-,-,-,XOUT32,-
+33,-,PB5,EIC_EXTINT5,-,-,-,-,-,-,-,-,-,XIN32,-
+34,-,VDDIO,-,-,-,-,-,-,-,-,-,-,-,-
+35,-,VSS,-,-,-,-,-,-,-,-,-,-,-,-
+36,-,PB6,EIC_EXTINT6,-,-,-,-,-,-,-,-,-,-,PTCXY11
+,,PB7 /,,,,,,,,,,,,
+37,RTC_OUT0,,EIC_EXTINT7,-,-,-,-,-,-,-,-,-,-,PTCXY10
+,,SUPC_OUT0,,,,,,,,,,,,
+,,PB8 /,,,,,,,,,,,,
+38,RTC_IN1,,EIC_EXTINT8,-,-,-,-,-,-,-,-,-,-,PTCXY9
+,,SUPC_OUT1,,,,,,,,,,,,
+39,RTC_IN0,PB9,EIC_EXTINT9,-,-,-,-,-,-,-,-,-,-,PTCXY8
+40,RTC_IN2,PB10,EIC_EXTINT10,-,-,TCC1_WO0,-,-,-,-,-,-,-,PTCXY7
+41,RTC_IN3,PB11,EIC_EXTINT11,-,-,TCC1_WO1,-,-,-,-,-,-,-,PTCXY6
+42,-,PB12,EIC_EXTINT12,-,-,TCC1_WO2,-,-,-,-,-,-,-,PTCXY5
+43,-,VDDREG,-,-,-,-,-,-,-,-,-,-,-,-
+44,-,VSS,-,-,-,-,-,-,-,-,-,-,-,-
+45,-,VDDIO,-,-,-,-,-,-,-,-,-,-,-,-
+46,-,PB13,EIC_EXTINT13,-,-,TCC1_WO3,-,-,-,TRACE_CLK,-,-,-,PTCXY4
+47,-,PB14,EIC_EXTINT14,-,-,TCC1_WO4,-,-,-,TRACE_DATA3,-,-,-,PTCXY3
+48,-,PB15,EIC_EXTINT15,-,-,TCC1_WO5,-,-,-,TRACE_DATA2,-,-,-,PTCXY2
+49,-,PB16,EIC_EXTINT0,-,-,TCC1_WO6,-,-,-,TRACE_DATA1,-,-,-,PTCXY1
+50,-,PB17,-,-,-,TCC1_WO7,-,-,-,TRACE_DATA0,-,-,-,PTCXY0
+51,-,PC0,EIC_EXTINT0,-,SERCOM0_PAD0,TCC0_WO0,-,-,-,SPI_IXS0_FSYNC,-,-,GCLK_IO4,-
+52,-,PC1,EIC_EXTINT1,-,SERCOM0_PAD1,TCC0_WO1,-,-,-,SPI_IXS0_SCK,-,-,GCLK_IO5,-
+53,-,PC2,EIC_EXTINT1,-,SERCOM0_PAD2,TCC0_WO2,-,-,-,SPI_IXS0_SDI,-,-,GCLK_IO6,PTC_EIC0
+54,-,PC3,EIC_EXTINT3,-,SERCOM0_PAD3,TCC0_WO3,-,-,-,SPI_IXS0_SDO,-,-,GCLK_IO7,PTC_EIC1
+55,-,PC4,EIC_EXTINT4,-,SERCOM1_PAD0,TCC0_WO4,-,CAN0_RX,-,SPI_IXS0_MCLK,-,-,-,-
+56,-,VDDIO,-,-,-,-,-,-,-,-,-,-,-,-
+57,-,VSS,-,-,-,-,-,-,-,-,-,-,-,-
+58,-,PC5,EIC_EXTINT5,-,SERCOM1_PAD1,TCC0_WO5,-,CAN0_TX,-,-,GMAC_TSUCOMP,-,-,-
+59,-,PC6,EIC_EXTINT6,AC_CMP1,SERCOM1_PAD2,TCC0_WO6,-,CAN1_RX,-,-,-,-,-,-
+60,-,PC7,EIC_EXTINT7,AC_CMP0,SERCOM1_PAD3,TCC0_WO7,-,CAN1_TX,-,-,-,-,-,-
+61,-,PC8,EIC_EXTINT8,-,SERCOM2_PAD0,TCC5_WO0,-,SQI0_CLK,SDHC0_SDCK,-,-,-,-,-
+62,-,PC9,EIC_EXTINT9,-,SERCOM2_PAD1,TCC5_WO1,-,SQI0_D0,SDHC0_SDDAT0,-,-,-,-,-
+63,-,PC10,EIC_EXTINT10,-,SERCOM2_PAD2,TCC6_WO0,-,SQI0_D1,SDHC0_SDDAT1,-,-,-,-,-
+64,-,PC11,EIC_EXTINT11,-,SERCOM2_PAD3,TCC6_WO1,-,SQI0_D2,SDHC0_SDDAT2,-,-,-,-,-
+65,-,PC12,EIC_EXTINT12,-,SERCOM3_PAD0,TCC4_WO0,-,SQI0_D3,SDHC0_SDDAT3,-,-,-,-,-
+66,-,PC13,EIC_EXTINT13,-,SERCOM3_ PAD1,TCC4_WO1,-,SQI0_CS0,SDHC0_SDCMD,-,-,-,-,-
+67,-,PC14,EIC_EXTINT14,-,SERCOM3_PAD2,TCC8_WO0,-,-,SDHC0_SDWP,-,-,-,-,-
+68,-,PC15,EIC_EXTINT15,-,SERCOM3_PAD3,TCC8_WO1,-,SQI0_CS1,SDHC0_SDCD,-,-,-,-,-
+69,-,VDDIO,-,-,-,-,-,-,-,-,-,-,-,-
+70,-,VSS,-,-,-,-,-,-,-,-,-,-,-,-
+71,-,RESET,-,-,-,-,-,-,-,RESET,-,-,-,-
+72,-,PC17,EIC_EXTINT1,-,SERCOM1_PAD3,-,-,-,-,TDI,GMAC_TSUCOMP,-,-,-
+73,-,PC18,EIC_EXTINT2,-,SERCOM1_PAD2,-,-,-,-,TMS/SWDIO,-,-,-,-
+74,-,PC19,EIC_EXTINT3,-,SERCOM1_PAD1,-,-,CAN0_RX,-,TDO/SWO,-,-,GCLK_IO1,-
+75,-,PC20,EIC_NMI,-,SERCOM1_PAD0,TCC9_WO5,-,CAN0_TX,-,TCK/SWCLK,-,-,GCLK_IO0,-
+76,-,D0-,-,-,-,-,-,-,-,-,-,-,-,-
+77,-,D0+,-,-,-,-,-,-,-,-,-,-,-,-
+78,-,USBID0,-,-,-,-,-,-,-,-,-,-,-,-
+79,-,VUSB3V3_0,-,-,-,-,-,-,-,-,-,-,-,-
+80,-,VSS,-,-,-,-,-,-,-,-,-,-,-,-
+81,-,VBUS0,-,-,-,-,-,-,-,-,-,-,-,-
+82,-,USBRBIAS0,-,-,-,-,-,-,-,-,-,-,-,-
+83,-,VSS,-,-,-,-,-,-,-,-,-,-,-,-
+84,-,VDDREG,-,-,-,-,-,-,-,-,-,-,-,-
+,,,,,,,,,,,,,XOUT /,
+85,-,PD0,EIC_EXTINT0,-,-,-,-,-,-,-,-,-,,-
+,,,,,,,,,,,,,GCLK_IO2,

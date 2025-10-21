@@ -1,0 +1,20 @@
+0,1,2,3,4
+,Table 2-1. Examples of Digital/Analog Isolators with Optional Level Translation,,,
+Example Digital/,,,,
+Analog Signal,Inductive Coupling,Capacitive Coupling,Opto Coupling,Analog/Digital Switch
+Isolation Circuits,,,,
+ADuM7241 / 40 ARZ,,,,
+,X,—,—,—
+(1 Mbps),,,,
+ADuM7241 / 40 CRZ,,,,
+,X,—,—,—
+(25 Mbps),,,,
+ISO721,—,X,—,—
+LTV-829S (2,,,,
+,—,—,X,—
+Channel),,,,
+LTV-849S (4,,,,
+,—,—,X,—
+Channel),,,,
+FSA266 / NC7WB66,—,—,—,X
+Designing for High-Speed Peripherals,,,,

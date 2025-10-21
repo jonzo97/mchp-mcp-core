@@ -16,11 +16,44 @@ mchp-mcp-core (reusable business logic)
 Data Layer (storage, retrieval)
 ```
 
+## Project Structure
+
+```
+mchp-mcp-core/
+├── mchp_mcp_core/          # Core library modules
+│   ├── extractors/         # Document extraction (PDF, PPTX, DOCX, tables)
+│   ├── storage/            # Vector stores (Qdrant, ChromaDB), SQLite cache
+│   ├── embeddings/         # sentence-transformers wrapper
+│   ├── llm/                # LLM client with retry logic
+│   ├── security/           # PII redaction, path validation
+│   └── utils/              # Config, logging, models
+├── tests/                  # Unit and integration tests
+├── docs/                   # Documentation and planning notes
+├── examples/               # Example scripts and usage patterns
+├── test_datasheets/        # Test PDFs for development
+├── manual_review/          # Manual verification workspace
+│   ├── screenshots/        # PDF screenshots of extracted tables
+│   ├── extracted_tables/   # Extracted data in CSV format
+│   └── ground_truth/       # Manually verified correct extractions
+└── README.md               # This file
+```
+
+**Development Guidelines**:
+- **Tests**: All test scripts (`test_*.py`, `check_*.py`) go in `tests/`
+- **Docs**: Planning documents, session reports, guides go in `docs/`
+- **Manual Review**: Screenshots and CSV exports for quality verification go in `manual_review/`
+- **Top-level**: Keep clean - only README, pyproject.toml, .gitignore, claude.md
+
 ## Features
 
 ### 📄 Document Extraction (`mchp_mcp_core.extractors`)
 - **PDF Extraction**: PyMuPDF-based extraction with structure preservation
-- **Table Extraction**: Multi-strategy table extraction using pdfplumber
+- **Advanced Table Extraction** (Phase 1-3A Complete): Multi-extractor consensus with confidence scoring
+  - 3 extractors: pdfplumber, Camelot (stream mode), PyMuPDF
+  - Multi-page table detection and merging (Azure AI 2024 heuristics)
+  - Separate header vs data row accuracy metrics (70% data, 30% header weighting)
+  - Screenshot generation for manual verification
+  - **Tuned for Microchip datasheets** - see `docs/CAMELOT_TUNING.md`
 - **PPTX Extraction**: PowerPoint slide parsing
 - **DOCX Extraction**: Microsoft Word document processing (NEW in v0.1.4)
 - **Intelligent Chunking**: Fixed-size and semantic chunking strategies

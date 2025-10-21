@@ -85,6 +85,11 @@ class ExtractedTable:
     has_borders: bool = False
     sparsity: float = 0.0  # Ratio of empty cells
 
+    # Header information (Phase 3D)
+    header_row_indices: List[int] = field(default_factory=list)  # Which rows are headers
+    header_detection_method: Optional[str] = None  # "pymupdf_native", "heuristic", etc.
+    header_confidence: float = 0.0  # Confidence in header detection
+
     # Validation issues
     issues: List[str] = field(default_factory=list)
     warnings: List[str] = field(default_factory=list)
@@ -333,6 +338,7 @@ class PdfPlumberExtractor(TableExtractor):
         pdf_path: str | Path,
         page_num: int,
         strategy: Optional[ExtractionStrategy] = None,
+        region: Optional[Tuple[float, float, float, float]] = None,
         **kwargs
     ) -> ExtractionResult:
         """
@@ -342,6 +348,7 @@ class PdfPlumberExtractor(TableExtractor):
             pdf_path: Path to PDF file
             page_num: Page number (0-indexed)
             strategy: Extraction strategy (or use default)
+            region: Optional bbox (x0, y0, x1, y1) to restrict search area
             **kwargs: Additional pdfplumber settings
 
         Returns:
@@ -365,6 +372,11 @@ class PdfPlumberExtractor(TableExtractor):
                     )
 
                 page = pdf.pages[page_num]
+
+                # Crop page to region if specified
+                if region:
+                    page = page.crop(region)
+                    self.logger.debug(f"Cropped page to region: {region}")
 
                 # Extract based on strategy
                 if strategy == ExtractionStrategy.HYBRID:
@@ -504,15 +516,63 @@ class CamelotExtractor(TableExtractor):
     Note: Requires camelot-py[cv] and opencv-python packages.
     """
 
-    def __init__(self, default_mode: str = "lattice"):
+    def __init__(
+        self,
+        default_mode: str = "stream",
+        # Lattice mode parameters (line-based detection)
+        line_scale: int = 40,
+        line_tol: int = 2,
+        joint_tol: int = 2,
+        # Stream mode parameters (text-based detection)
+        row_tol: int = 2,
+        column_tol: int = 0,
+        edge_tol: int = 50,
+        # Common parameters
+        copy_text: Optional[List[str]] = None,
+        shift_text: Optional[List[str]] = None
+    ):
         """
         Initialize Camelot extractor.
 
         Args:
             default_mode: Default extraction mode ("lattice" or "stream")
+
+            Lattice mode parameters (line-based table detection):
+                line_scale: Line detection scale (default: 40, try 15-100 for thin/thick lines)
+                line_tol: Tolerance for detecting table lines (default: 2 pixels)
+                joint_tol: Tolerance for detecting line intersections (default: 2 pixels)
+
+            Stream mode parameters (text-based table detection):
+                row_tol: Tolerance for combining rows (default: 2 pixels, higher = merge more)
+                column_tol: Tolerance for combining columns (default: 0 pixels)
+                edge_tol: Edge detection tolerance (default: 50 pixels)
+
+            Common parameters:
+                copy_text: Copy text from specified regions ['v', 'h']
+                shift_text: Shift text in specified directions ['l', 'r', 't', 'b']
         """
         super().__init__("camelot")
         self.default_mode = default_mode
+
+        # Store mode-specific parameters separately
+        self.lattice_params = {
+            'line_scale': line_scale,
+            'line_tol': line_tol,
+            'joint_tol': joint_tol
+        }
+
+        self.stream_params = {
+            'row_tol': row_tol,
+            'column_tol': column_tol,
+            'edge_tol': edge_tol
+        }
+
+        # Common parameters
+        self.common_params = {}
+        if copy_text:
+            self.common_params['copy_text'] = copy_text
+        if shift_text:
+            self.common_params['shift_text'] = shift_text
 
     def is_available(self) -> bool:
         """Check if Camelot is available."""
@@ -527,6 +587,7 @@ class CamelotExtractor(TableExtractor):
         pdf_path: str | Path,
         page_num: int,
         mode: Optional[str] = None,
+        region: Optional[Tuple[float, float, float, float]] = None,
         **kwargs
     ) -> ExtractionResult:
         """
@@ -536,6 +597,7 @@ class CamelotExtractor(TableExtractor):
             pdf_path: Path to PDF file
             page_num: Page number (0-indexed)
             mode: Extraction mode ("lattice" or "stream", or use default)
+            region: Optional bbox (x0, y0, x1, y1) to restrict search area
             **kwargs: Additional Camelot options
 
         Returns:
@@ -561,12 +623,28 @@ class CamelotExtractor(TableExtractor):
             # Camelot uses 1-indexed pages
             pages_str = str(page_num + 1)
 
+            # Build parameters based on mode (lattice vs stream have different valid params)
+            if mode == "lattice":
+                camelot_params = {**self.lattice_params, **self.common_params}
+            else:  # stream mode
+                camelot_params = {**self.stream_params, **self.common_params}
+
+            # Merge with user-provided kwargs (user params override defaults)
+            camelot_params.update(kwargs)
+
+            # Add table_areas if region specified
+            if region:
+                # Camelot expects table_areas as "x1,y1,x2,y2" string
+                table_areas_str = f"{region[0]},{region[1]},{region[2]},{region[3]}"
+                camelot_params['table_areas'] = [table_areas_str]
+                self.logger.debug(f"Using table_areas: {table_areas_str}")
+
             # Extract tables
             raw_tables = camelot.read_pdf(
                 str(pdf_path),
                 pages=pages_str,
                 flavor=mode,
-                **kwargs
+                **camelot_params
             )
 
             # Convert to ExtractedTable objects
@@ -656,6 +734,7 @@ class PyMuPDFExtractor(TableExtractor):
         self,
         pdf_path: str | Path,
         page_num: int,
+        region: Optional[Tuple[float, float, float, float]] = None,
         **kwargs
     ) -> ExtractionResult:
         """
@@ -664,6 +743,7 @@ class PyMuPDFExtractor(TableExtractor):
         Args:
             pdf_path: Path to PDF file
             page_num: Page number (0-indexed)
+            region: Optional bbox (x0, y0, x1, y1) to restrict search area
             **kwargs: Additional options
 
         Returns:
@@ -701,7 +781,14 @@ class PyMuPDFExtractor(TableExtractor):
             page = doc[page_num]
 
             # Find tables using PyMuPDF's table detection
-            table_finder = page.find_tables()
+            # Pass region as 'clip' parameter if specified
+            find_tables_kwargs = {}
+            if region:
+                # PyMuPDF expects clip as fitz.Rect or tuple
+                find_tables_kwargs['clip'] = region
+                self.logger.debug(f"Using clip region: {region}")
+
+            table_finder = page.find_tables(**find_tables_kwargs)
 
             tables = []
             if table_finder and hasattr(table_finder, 'tables'):
@@ -722,6 +809,30 @@ class PyMuPDFExtractor(TableExtractor):
                         # Get bounding box
                         if hasattr(table_obj, 'bbox'):
                             table.bbox = table_obj.bbox
+
+                        # Extract header information (Phase 3D)
+                        if hasattr(table_obj, 'header') and table_obj.header:
+                            header = table_obj.header
+
+                            # Determine which rows are headers
+                            if hasattr(header, 'external') and header.external:
+                                # Header is outside table bbox, so first row is data
+                                table.header_row_indices = []
+                                table.header_detection_method = "pymupdf_native_external"
+                                table.header_confidence = 1.0
+                            else:
+                                # Header is within table (first row contains header data)
+                                table.header_row_indices = [0]
+                                table.header_detection_method = "pymupdf_native_internal"
+                                table.header_confidence = 1.0
+
+                            # Check if header has multiple rows (check for newlines in header names)
+                            if hasattr(header, 'names') and header.names:
+                                # If any header name has newlines, likely multi-row header
+                                has_newlines = any('\n' in str(name) for name in header.names if name)
+                                if has_newlines and len(table.header_row_indices) == 1:
+                                    # Extend to include likely second header row
+                                    table.header_row_indices = [0, 1]
 
                         # Validate
                         table = self.validate_table(table)

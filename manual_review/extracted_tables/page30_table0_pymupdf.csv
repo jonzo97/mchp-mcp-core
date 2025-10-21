@@ -1,0 +1,56 @@
+Pin,"Priority
+Function",MUXEN=0,MUXEN =1,,,,,,,,,,,
+,,,PMUX Values,,,,,,,,,,,
+,,,00,01,03,05,06,07,08,09,0A,0B,0D,0F
+,"RTC
+security
+tamper
+input
+loop(s)",,"EIC /
+EIC_EXTINT(n)","ADC /
+CMP",SERCOM(n),TCC WO(n),MLB,"CAN(n) /
+SQI(n)",SDMMC,"SPI_IXS /
+SWCLK,
+SWDIO,
+SWO, TRACE_CLK,
+TRACE_DATA[3:0]",ETH,"Only 2
+alternate
+ETH
+signals",GCLK,PTC
+1,-,PA0,EIC_EXTINT0,-,-,-,-,-,-,-,GMAC_GTX1,-,-,-
+2,-,PA1,EIC_EXTINT1,-,-,-,-,-,-,-,GMAC_GTX0,-,-,-
+3,-,PA2,EIC_EXTINT2,-,-,TCC2_WO5,-,-,-,-,GMAC_GTXEN,-,-,-
+4,-,PA3,EIC_EXTINT3,-,SERCOM2_PAD3,TCC2_WO4,-,-,-,-,GMAC_GMDC,-,-,-
+5,-,PA4,EIC_EXTINT4,-,SERCOM2_PAD2,TCC2_WO3,-,-,-,-,GMAC_GMDIO,-,-,-
+6,-,VSS,-,-,-,-,-,-,-,-,-,-,-,-
+7,-,VDDIO,-,-,-,-,-,-,-,-,-,-,-,-
+8,-,PA5,EIC_EXTINT4,-,-,TCC3_WO0,-,-,-,-,"GMAC_GRXDV/
+GMAC_GCRS_DV",-,-,-
+9,-,PA6,EIC_EXTINT6,-,-,TCC3_WO1,-,-,-,-,GMAC_GRXER,-,-,-
+10,-,PA7,EIC_EXTINT7,ADC3_AIN3,-,-,-,-,-,-,-,-,-,-
+11,-,PA8,EIC_EXTINT8,ADC3_AIN2,-,-,-,-,-,-,-,-,-,-
+12,-,PA9,EIC_EXTINT9,ADC3_AIN1,-,-,MB_TCK,-,-,-,-,-,-,-
+13,-,PA10,EIC_EXTINT10,ADC3_AIN0,-,-,-,-,-,-,-,-,-,-
+14,-,PA11,EIC_EXTINT11,ADC2_AIN3,-,-,MB_TMS,-,-,-,-,-,-,-
+15,-,PA12,EIC_EXTINT12,ADC2_AIN2,-,-,MB_TDI,-,-,-,-,-,-,-
+16,-,PA13,EIC_EXTINT13,ADC2_AIN1,-,-,-,-,-,-,-,-,-,-
+17,-,PA14,EIC_EXTINT14,ADC2_AIN0,-,-,MB_TDO,-,-,-,-,-,-,-
+18,-,PA15,EIC_EXTINT15,ADC1_AIN3,-,-,-,-,-,-,-,-,-,-
+19,-,VSS,-,-,-,-,-,-,-,-,-,-,-,-
+20,-,VDDIO,-,-,-,-,-,-,-,-,-,-,-,-
+21,-,PA16,EIC_EXTINT0,ADC1_AIN2,-,-,-,-,-,-,-,-,-,-
+22,-,PA17,EIC_EXTINT1,ADC1_AIN1,-,-,-,-,-,-,-,-,-,-
+23,-,PA18,EIC_EXTINT2,ADC1_AIN0,-,-,-,-,-,-,-,-,-,-
+24,-,PA19,EIC_EXTINT3,"ADC0_AIN5/
+AC_AIN3",-,-,-,-,-,-,-,-,-,-
+25,-,PA20,EIC_EXTINT4,"ADC0_AIN4/
+AC_AIN2",-,-,-,-,-,-,-,-,-,-
+26,RTC_OUT1,PB0,EIC_EXTINT0,"ADC0_AIN3/
+AC_AIN1",-,-,-,-,-,-,-,-,-,-
+27,RTC_IN4,PB1,EIC_EXTINT1,"ADC0_AIN2/
+AC_AIN0",-,-,-,-,-,-,-,-,-,-
+28,RTC_OUT2,PB2,EIC_EXTINT2,"ADC_VREFH/
+ADC0_AIN1",-,-,-,-,-,-,-,-,-,-
+29,RTC_OUT3,PB3,EIC_EXTINT3,ADC0_AIN0,-,-,-,-,-,-,-,-,-,-
+30,-,AVSS,-,-,-,-,-,-,-,-,-,-,-,-
+31,-,AVDD,-,-,-,-,-,-,-,-,-,-,-,-

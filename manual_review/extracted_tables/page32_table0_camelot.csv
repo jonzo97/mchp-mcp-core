@@ -1,0 +1,38 @@
+0,1,2,3,4,5,6,7,8,9,10,11,12,13,14
+Table 5-1. 100-pin TQFP EP Thin Plastic Quad Flatpack (continued),,,,,,,,,,,,,,
+,,,,,,,,,MUXEN =1,,,,,
+,Priority,,,,,,,,,,,,,
+,,,,,,,,,PMUX Values,,,,,
+,Function,,,,,,,,,,,,,
+,,,00,01,03,05,06,07,08,09,0A,0B,0D,0F
+,,,,,,,,,,SPI_IXS /,,,,
+Pin,RTC,MUXEN=0,,,,,,,,,,Only 2,,
+,,,,,,,,,,"SWCLK,",,,,
+,security,,,,,,,,,,,alternate,,
+,tamper,,EIC /,ADC /,,,,CAN(n) /,,"SWDIO,",,,,
+,,,,,SERCOM(n),TCC WO(n),MLB,,SDMMC,,ETH,,GCLK,PTC
+,,,EIC_EXTINT(n),CMP,,,,SQI(n),,,,ETH,,
+,input,,,,,,,,,"SWO, TRACE_CLK,",,,,
+,loop(s),,,,,,,,,,,signals,,
+,,,,,,,,,,TRACE_DATA[3:0],,,,
+,,,,,,,,,,,,,XIN /,
+86,-,PD1,EIC_EXTINT1,-,-,-,-,-,-,-,-,-,,-
+,,,,,,,,,,,,,GCLK_IO3,
+,,,,,,,,,,,,,GMAC_GTX,
+87,-,PD2,EIC_EXTINT2,-,-,TCC9_WO4,-,-,-,SPI_IXS0_FSYNC,-,-,,-
+,,,,,,,,,,,,,ER,
+88,-,PD3,EIC_EXTINT3,-,SERCOM3_PAD0,TCC9_WO3,-,-,-,SPI_IXS0_SDI,GMAC_GTX3,-,-,-
+89,-,PD4,EIC_EXTINT4,-,SERCOM3_ PAD1,TCC9_WO0,-,-,-,SPI_IXS0_SCK,GMAC_GTX2,-,-,-
+90,-,PD5,EIC_EXTINT5,-,SERCOM3_PAD2,TCC9_WO1,-,-,-,SPI_IXS0_SDO,GMAC_TXCK,-,-,-
+91,-,PD6,EIC_EXTINT6,-,SERCOM3_PAD3,TCC9_WO2,-,-,-,SPI_IXS0_MCLK,GMAC_GRX3,-,-,-
+92,-,PD7,EIC_EXTINT7,-,-,TCC7_WO1,MLBCLK,-,-,-,GMAC_GRX2,-,-,-
+93,-,VDDREG,-,-,-,-,-,-,-,-,-,-,-,-
+94,-,VSS,-,-,-,-,-,-,-,-,-,-,-,-
+95,-,VDDIO,-,-,-,-,-,-,-,-,-,-,-,-
+96,-,PD8,EIC_EXTINT8,-,-,TCC7_WO0,MLBSIG,CAN1_RX,-,-,GMAC_GCOL,-,-,-
+97,-,PD9,EIC_EXTINT9,-,-,-,MLBDAT,CAN1_TX,-,-,GMAC_GCRS,-,-,-
+98,-,PD10,EIC_EXTINT10,-,-,TCC2_WO0,-,-,-,-,GMAC_GRX1,-,-,-
+99,-,PD11,EIC_EXTINT11,-,SERCOM2_PAD0,TCC2_WO1,-,-,-,-,GMAC_GRX0,-,-,-
+10,,,,,,,,,,,,GMAC_G,,
+,-,PD12,EIC_EXTINT12,-,SERCOM2_PAD1,TCC2_WO2,-,-,-,-,GMAC_GREFCK,,-,-
+0,,,,,,,,,,,,RXCK,,

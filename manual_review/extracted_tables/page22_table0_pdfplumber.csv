@@ -1,0 +1,57 @@
+,,,,,,PIC,32CZ CA8x/CA9x,Family
+,,,,,,,,
+,,,,,,Guidel,ines for Getting S,tarted
+,,,,,,,,
+2.5.,Debugging or Progra,mming Pins,,,,,,
+,,,,,,,,
+,"The SWDIO, SWO, SWCLK",pins are used fo,r In-Circu,it programmi,ng and deb,ugging,purposes. It,
+,is recommended to keep,the trace length,between,the debug ex,ternal conn,ector a,nd the debug,
+,pins on the device as sho,rt as possible to,minimize,ESD/EMI vuln,erabilities.,If the d,ebug externa,l
+,connector is expected to,experience an E,"SD event,",a series resist,or is recom,mende,"d, with the va",lue
+,in the range of a few tens,"of Ohms, not to",exceed 1,00 Ohms with,protection,using,Transient Vol,tage
+,"Suppressors (TVS), at the",user’s discretion,. Refer to,the Schemati,c Checklist,chapte,r.,
+,,,,,,,,
+2.6.,JTAG,,,,,,,
+,,,,,,,,
+,"The TMS, TDO, TDI and T",CK pins are used,for testin,g and debugg,ing accordi,ng to t,he Joint Test,
+,Action Group (JTAG) stan,dard. It is recom,mended t,o keep the tra,ce length b,etween,the JTAG,
+,connector and the JTAG p,ins on the devic,e as short,as possible. I,f the JTAG c,onnect,or is expecte,d to
+,"experience an ESD event,",a series resistor,is recom,"mended, with",the value i,n the r,ange of a few,tens
+,"of Ohms, not to exceed 1",00 Ohms with pr,otection,using Transie,nt Voltage S,uppres,"sors (TVS), at",the
+,user’s discretion. Refer to,the Schematic C,hecklist c,hapter.,,,,
+,,,,,,,,
+2.7.,Trace,,,,,,,
+,,,,,,,,
+,When present on select p,"in counts, the tr",ace pins c,an be connec,ted to a ha,rdware,trace-enable,d
+,programmer/debugger t,o provide a comp,ressed re,al-time instru,ction trace.,When,used for trac,"e,"
+,"the TRACE_DATA0, TRACE","_DATA1, TRACE_","DATA2, T",RACE_DATA3,and TRACE,CLK pin,s should be,
+,dedicated for this use. Th,e trace hardwar,e requires,a 22 Ohm se,ries resisto,r betwe,en the trace,
+,pins and the external trac,e connector.,,,,,,
+,,,,,,,,
+2.8.,External Oscillator P,ins,,,,,,
+,,,,,,,,
+,Many MCUs have options,for at least two,oscillator,s: a high-freq,uency prim,ary osci,llator and a,
+,low-frequency secondary,oscillator.,,,,,,
+,,,,,,,,
+,The oscillator circuit shou,ld be placed on,the same,side of the bo,ard as the,device.,"Also, place",
+,the oscillator circuit close,to the respectiv,e oscillato,"r pins, not ex",ceeding on,e-half i,nch (12 mm),
+,distance between them.,The load capacito,rs should,be placed ne,xt to the os,cillator,"itself, on the",
+,same side of the board. U,se a grounded c,opper po,ur around the,oscillator,circuit t,o isolate them,
+,from surrounding circuits,. The grounded,copper po,ur should be,routed dire,ctly to,the MCU gro,und.
+,Do not run any signal tra,ces or power tra,ces inside,the ground p,"our. Also, if",using,a two-sided,
+,"board, avoid any traces o",n the other side,of the bo,ard where the,crystal is p,laced.,A suggested,
+,layout is illustrated in the,following figure,.,,,,,
+,,,,,,,,
+,Figure 2-4. Suggested Oscilla,tor Circuit Placeme,nt,,,,,
+,,,,,,,,
+,,,,,Oscillator,,,
+,,,,,Secondary,,,
+,,,,,,,,
+,,,,G,uard Trace,,,
+,,,,,,,,
+,,,,,Guard Ring,,,
+,,,,,,,,
+,,,,Ma,in Oscillator,,,
+,,,,,,,,
+,,,Data Sh,eet,,,DS6000,1749K
+,,© 2025 Microchip,Technology,Inc. and its subs,idiaries,,,

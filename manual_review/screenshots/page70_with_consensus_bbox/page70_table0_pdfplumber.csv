@@ -1,0 +1,13 @@
+Table 6-19. SDHC0 and SDHC1 Pinout I/O Descriptions (Peripheral Function I) (continued),,,,,,,,
+PIN NAME,PIN NUMBER,,,,,PIN TYPE,"FUNCTION
+TYPE",DESCRIPTION
+,"100 pin
+TQFP EP","144 pin
+TQFP EP","144 pin
+TFBGA","176 pin
+TFBGA","208 pin
+TFBGA",,,
+SDHC1_SDDAT3,—,—,—,H12,H18,I/O,ST/CMOS,"SD Host Controller 1 DATA3
+(10K-100K Pull-up required)"
+SDHC1_SDWP,—,—,—,H15,G15,I,ST,"SD Host Controller 1 Write Protect
+(10K-100K Pull-up required)"
